@@ -9,6 +9,8 @@ async function example() {
 
     let hasBett = false;
 
+    let isLoggedIn =false;
+
     let parentElement;
 
     // load the website
@@ -35,13 +37,30 @@ async function example() {
              driver
             .findElement(By.xpath("//button[normalize-space()='Login']"))
             .click();
+
+            isLoggedIn=true;
+            if(isLoggedIn){
+              console.log("the logged in value is ",isLoggedIn)
+              try{
+                driver.wait(until.elementLocated(By.xpath('//button[@title="Skip"]')),5000).click()
+                console.log("skip element has been found")
+              }catch(e){
+                console.log("Div pop-up has not been found")
+              }
+            }            
         }catch(e){
             console.log("Element not found",e)
             driver.quit()
         }
       
-    }, 7000);
+    }, 12000);
 
+
+
+      
+
+    
+    
     // setTimeout(async()=>{
     //     // click the skip button
     //     // Wait for the popup to appear (use an appropriate condition)
