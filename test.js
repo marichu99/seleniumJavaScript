@@ -17,22 +17,22 @@ async function example() {
     // navigate the application
     await driver.get("https://play.pakakumi.com/login");    
 
-    setTimeout(async () => {
+    setTimeout( () => {
         try{
             // fill in the username
-            await driver
+             driver
             .findElement(
                 By.xpath("//div[@class='css-acwcvw']//input[@type='text']")
             )
             .sendKeys(username);
 
             // fill in the password
-            await driver
+             driver
             .findElement(By.xpath("//input[@type='password']"))
             .sendKeys(password);
 
             // click the login button
-            await driver
+             driver
             .findElement(By.xpath("//button[normalize-space()='Login']"))
             .click();
         }catch(e){
@@ -40,28 +40,28 @@ async function example() {
             driver.quit()
         }
       
-    }, 3000);
+    }, 7000);
 
-    setTimeout(async()=>{
-        // click the skip button
-        // Wait for the popup to appear (use an appropriate condition)
-        driver.wait(until.elementLocated(By.className("__floater __floater__open")), 5000);
+    // setTimeout(async()=>{
+    //     // click the skip button
+    //     // Wait for the popup to appear (use an appropriate condition)
+    //     driver.wait(until.elementLocated(By.className("__floater __floater__open")), 5000);
 
-        // Find the skip button by its attributes (e.g., title or type)
-        const skipButton = await driver.findElement(By.xpath('//button[@title="Skip"]'));
-        skipButton.click();
+    //     // Find the skip button by its attributes (e.g., title or type)
+    //     const skipButton = await driver.findElement(By.xpath('//button[@title="Skip"]'));
+    //     skipButton.click();
         
-    },3000)
+    // },3000)
 
-    setTimeout(()=>{
-        // get the bet button
-        let btnBet = driver.findElement(By.className("css-15qmqf7"));
-        btnBet.click();
-        hasBett=true;
+    // setTimeout(()=>{
+    //     // get the bet button
+    //     let btnBet = driver.findElement(By.className("css-15qmqf7"));
+    //     btnBet.click();
+    //     hasBett=true;
 
-        // main logic
-        parentElement = document.getElementById("tour_multiplier");
-    },1000)
+    //     // main logic
+    //     parentElement = document.getElementById("tour_multiplier");
+    // },1000)
     
 
     // main logic
