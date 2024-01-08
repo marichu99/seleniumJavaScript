@@ -11,6 +11,8 @@ async function example() {
 
     let isLoggedIn =false;
 
+    let isSkippedClicked = true;
+
     let parentElement;
 
     // load the website
@@ -42,10 +44,26 @@ async function example() {
             if(isLoggedIn){
               console.log("the logged in value is ",isLoggedIn)
               try{
-                driver.wait(until.elementLocated(By.xpath('//button[@title="Skip"]')),5000).click()
-                console.log("skip element has been found")
+                driver.wait(until.elementLocated(By.xpath('//button[@title="Skip"]')),8000).click()
+                
+                isSkippedClicked = true;
+                
+
+                setTimeout(async()=>{
+                  if(isSkippedClicked){
+                    // look for the bet button
+                    const betBtn = await driver.wait(until.elementLocated(By.className("css-15qmqf7")),2000)
+                    
+                    // when the button is found, set the prequisites of the game
+                    setAmountandBet(driver,betBtn);
+
+                    // check actively and cash out in time
+                    recursiveElementCheck(driver);
+                  }
+                },10000)                                
+
               }catch(e){
-                console.log("Div pop-up has not been found")
+                console.log("The error is ",e)
               }
             }            
         }catch(e){
@@ -55,44 +73,62 @@ async function example() {
       
     }, 12000);
 
-
-
+    let counter=0;
+    async function recursiveElementCheck(driver,betBtn){
       
+      try{
+        // check for this element every split second
+       await driver.wait(until.elementLocated(By.className("css-1wyrx7x")),200000)
 
-    
-    
-    // setTimeout(async()=>{
-    //     // click the skip button
-    //     // Wait for the popup to appear (use an appropriate condition)
-    //     driver.wait(until.elementLocated(By.className("__floater __floater__open")), 5000);
+        // if found, print success message
+        counter+=1;
+        console.log("Bust has been found",counter)
 
-    //     // Find the skip button by its attributes (e.g., title or type)
-    //     const skipButton = await driver.findElement(By.xpath('//button[@title="Skip"]'));
-    //     skipButton.click();
+        // cash out
+        await betBtn.click()
+
+        // quit the driver
+        driver.quit()
         
-    // },3000)
+        // recursiveElementCheck(driver);
+        
+      }catch(e){
+        if(e.name == "TimeOutError"){
+          console.log("The error name is ",e.name())
+          // recurse till we find the element
+          recursiveElementCheck(driver)
+        }        
+      }      
+    }
 
-    // setTimeout(()=>{
-    //     // get the bet button
-    //     let btnBet = driver.findElement(By.className("css-15qmqf7"));
-    //     btnBet.click();
-    //     hasBett=true;
+    async function setAmountandBet(driver,betBtn){
+      try{
+        // find the bet amount and set it to 10 shillings
+        const amount = await driver.findElement(By.xpath("//input[@id='tour_bet_amount']"));
 
-    //     // main logic
-    //     parentElement = document.getElementById("tour_multiplier");
-    // },1000)
-    
+        // clear the amount
+        await amount.clear();
 
-    // main logic
-    // while (true) {
-    //   setTimeout(() => {
-    //     // after every millisecond, check whether the busted element exists
-    //     let bustedElement = parentElement.querySelector(".css-1wyrx7x");
-    //     if (bustedElement != null) {
-    //       btnBet.click();
-    //     }
-    //   }, 0.1);
-    // }
+        // set the amount 
+        await amount.sendKeys("10");
+
+        // get the auto cash out field and set it to 10
+        const autoCashOut = await driver.findElement(By.xpath("//input[@id='tour_bet_auto_cashout']"));
+
+        await autoCashOut.clear();
+
+        await autoCashOut.sendKeys("10");
+
+        // find the auto play button
+        // await driver.findElement(By.className("react-switch-handle")).click()
+
+        // click the bet button
+        await betBtn.click()
+      }catch(e){
+        console.log("The element that was not found is ", e)
+      }
+    }
+
   } catch (e) {
     console.error("The error is ", e);
   }
