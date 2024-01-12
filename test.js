@@ -9,9 +9,13 @@ async function example() {
 
     let hasBett = false;
 
+    let hasNextRoundStart = false;
+
     let isLoggedIn =false;
 
     let isSkippedClicked = true;
+
+    // let isRoundReady = false;
 
     let parentElement;
 
@@ -43,24 +47,27 @@ async function example() {
             isLoggedIn=true;
             if(isLoggedIn){
               console.log("the logged in value is ",isLoggedIn)
-              try{
-                driver.wait(until.elementLocated(By.xpath('//button[@title="Skip"]')),8000).click()
-                
-                isSkippedClicked = true;
-                
+              try{             
 
                 setTimeout(async()=>{
+
+                driver.wait(until.elementLocated(By.xpath('//button[@title="Skip"]')),12000).click()                
+                isSkippedClicked = true;
+
+                console.log("Skip has been clicked")
                   if(isSkippedClicked){
                     // look for the bet button
                     const betBtn = await driver.wait(until.elementLocated(By.className("css-15qmqf7")),2000)
-                    
-                    // when the button is found, set the prequisites of the game
-                    setAmountandBet(driver,betBtn);
+
+                    hasNextRoundStarted(driver,betBtn);   
 
                     // check actively and cash out in time
-                    recursiveElementCheck(driver);
+                    console.log("Has next round started ? ",hasNextRoundStart)
+                    if(hasNextRoundStart){
+                      recursiveElementCheck(driver,betBtn);
+                    }
                   }
-                },10000)                                
+                },4000)                                
 
               }catch(e){
                 console.log("The error is ",e)
@@ -77,27 +84,31 @@ async function example() {
     async function recursiveElementCheck(driver,betBtn){
       
       try{
+        console.log("The bet button is ", betBtn)
         // check for this element every split second
        await driver.wait(until.elementLocated(By.className("css-1wyrx7x")),200000)
-
+      
+       setInterval(()=>{
+          betBtn.click();
+       },0.1)
+       
         // if found, print success message
         counter+=1;
         console.log("Bust has been found",counter)
 
-        // cash out
-        await betBtn.click()
-
-        // quit the driver
-        driver.quit()
+        // cash out if the user had bet and the round had already started
         
-        // recursiveElementCheck(driver);
+
+        recursiveElementCheck(driver,betBtn);
+        
         
       }catch(e){
         if(e.name == "TimeOutError"){
-          console.log("The error name is ",e.name())
+          console.log("The error name is ",e.name)
           // recurse till we find the element
-          recursiveElementCheck(driver)
-        }        
+          recursiveElementCheck(driver,betBtn)
+        } 
+        recursiveElementCheck(driver,betBtn);       
       }      
     }
 
@@ -123,9 +134,26 @@ async function example() {
         // await driver.findElement(By.className("react-switch-handle")).click()
 
         // click the bet button
-        await betBtn.click()
+        await betBtn.click();  
+
+        hasBett=true;
+
       }catch(e){
         console.log("The element that was not found is ", e)
+      }
+    }
+
+    async function hasNextRoundStarted(driver,betBtn){
+      try{
+        await driver.wait(until.elementLocated(By.className("css-tfmndh")),200000);
+
+        console.log("The next round is now ready")
+
+        setAmountandBet(driver,betBtn);
+        hasNextRoundStart=true;
+      }catch(e){
+        console.log("The error is ",e);
+        hasNextRoundStarted=false;
       }
     }
 
