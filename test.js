@@ -54,18 +54,13 @@ async function example() {
                 driver.wait(until.elementLocated(By.xpath('//button[@title="Skip"]')),12000).click()                
                 isSkippedClicked = true;
 
-                console.log("Skip has been clicked")
+                  console.log("Skip has been clicked")
                   if(isSkippedClicked){
                     // look for the bet button
                     const betBtn = await driver.wait(until.elementLocated(By.className("css-15qmqf7")),2000)
 
                     hasNextRoundStarted(driver,betBtn);   
 
-                    // check actively and cash out in time
-                    console.log("Has next round started ? ",hasNextRoundStart)
-                    if(hasNextRoundStart){
-                      recursiveElementCheck(driver,betBtn);
-                    }
                   }
                 },4000)                                
 
@@ -84,20 +79,17 @@ async function example() {
     async function recursiveElementCheck(driver,betBtn){
       
       try{
-        console.log("The bet button is ", betBtn)
+        betBtn.click()
         // check for this element every split second
        await driver.wait(until.elementLocated(By.className("css-1wyrx7x")),200000)
-      
-       setInterval(()=>{
-          betBtn.click();
-       },0.1)
+
+        // cash out if the user had bet and the round had already started     
+        betBtn.click();
        
         // if found, print success message
         counter+=1;
         console.log("Bust has been found",counter)
 
-        // cash out if the user had bet and the round had already started
-        
 
         recursiveElementCheck(driver,betBtn);
         
@@ -134,9 +126,11 @@ async function example() {
         // await driver.findElement(By.className("react-switch-handle")).click()
 
         // click the bet button
-        await betBtn.click();  
+        await betBtn.click(); 
 
         hasBett=true;
+
+        recursiveElementCheck(driver,betBtn);
 
       }catch(e){
         console.log("The element that was not found is ", e)
@@ -150,6 +144,7 @@ async function example() {
         console.log("The next round is now ready")
 
         setAmountandBet(driver,betBtn);
+        
         hasNextRoundStart=true;
       }catch(e){
         console.log("The error is ",e);
